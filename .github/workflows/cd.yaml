@@ -19,7 +19,7 @@ jobs:
 
       - name: Get the arch name
         run: |
-          echo "ARCH_NAME=$(uname -m)" >> $GITHUB_ENV
+          echo "ARCH_NAME=aarch64" >> $GITHUB_ENV
 
       - name: Download opt_distrod
         uses: actions/download-artifact@v2
@@ -81,7 +81,7 @@ jobs:
       - name: Get the arch name
         shell: bash
         run: |
-          echo "ARCH_NAME=$(uname -m)" >> $GITHUB_ENV
+          echo "ARCH_NAME=aarch64" >> $GITHUB_ENV
 
       - name: Download the Distrod's rootfs
         uses: actions/download-artifact@v2
@@ -118,7 +118,7 @@ jobs:
       - name: Get the arch name
         shell: bash
         run: |
-          echo "ARCH_NAME=$(uname -m)" >> $GITHUB_ENV
+          echo "ARCH_NAME=aarch64" >> $GITHUB_ENV
 
       - name: Download portproxy.exe
         uses: actions/download-artifact@v2
@@ -132,7 +132,9 @@ jobs:
           sudo apt-get upgrade
           sudo apt-get install -y patchelf
           sudo apt-get install -y apt-file; sudo apt-file update
-          cargo install --git https://github.com/EmbarkStudios/cargo-about.git --rev b4d194a734215f55a88191236cd5112ddb198920
+          sudo update-alternatives --set gcc /usr/bin/aarch64-linux-gnu-gcc
+          rustup target add aarch64-unknown-linux-gnu
+          RUSTFLAGS="--target='aarch64-unknown-linux-gnu'" cargo install --git https://github.com/EmbarkStudios/cargo-about.git --rev b4d194a734215f55a88191236cd5112ddb198920
 
       - name: Build the Distrod command
         run: make distrod-release
@@ -171,11 +173,14 @@ jobs:
             ~/.cargo/git
             distrod/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
 
       - name: Get the arch name
         shell: bash
         run: |
-          echo "ARCH_NAME=$(uname -m)" >> $GITHUB_ENV
+          echo "ARCH_NAME=aarch64" >> $GITHUB_ENV
 
       - name: Build
         run: make -f windows.mk portproxy.exe
