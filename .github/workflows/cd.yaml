@@ -214,5 +214,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "portproxy-${{ env.ARCH_NAME }}"
-          path: distrod/target/release/aarch64-pc-windows-msvc/portproxy.exe
+          path: distrod/target/release/aarch64-pc-windows-msvc/release/portproxy.exe
           if-no-files-found: error
