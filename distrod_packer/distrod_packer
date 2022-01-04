@@ -8,6 +8,7 @@ import re
 import sys
 import subprocess
 import shutil
+import errno
 from pathlib import Path
 from typing import Union, Optional, Tuple, List
 
@@ -120,10 +121,26 @@ def make_distrod_distribution(workspace_path: Path, output_dst: Path):
 
 def copy_target_binary(bin_name: str, workspace_path: Path, work_dir: Path) -> ContainerPath:
     bin_path = get_bin_dir_in_container(bin_name)
-    shutil.copy(f"{workspace_path}/target/release/{bin_name}",
-                bin_path.to_host(work_dir))
-    os.system(f"chmod a+x {bin_path.to_host(work_dir)}")
-    return bin_path
+    directories = [
+        "/target/release/",
+        "/target/aarch64-pc-windows-msvc/release/",
+        "/target/aarch64-unknown-linux-gnu/release/"
+    ]
+
+    for d in directories:
+        try:
+            shutil.copy(f"{workspace_path}{d}{bin_name}",
+                        bin_path.to_host(work_dir))
+            os.system(f"chmod a+x {bin_path.to_host(work_dir)}")
+            return bin_path
+        except FileNotFoundError:
+            continue
+
+    raise FileNotFoundError(
+        errno.ENOENT,
+        os.strerror(errno.ENOENT),
+        f"{workspace_path}{directories[0]}{bin_name}"
+    )
 
 
 def make_bin_static_for_linux(bin_path: Path, work_dir: Path):
