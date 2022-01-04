@@ -199,6 +199,9 @@ jobs:
           cd $(ls -d */|head -n 1)
           arm64Link=$(pwd)/bin/Hostx64/arm64/link.exe
           x64Link=$(pwd)/bin/Hostx64/x64/link.exe
+          arm64Link=${arm64Link/\/c/C:}
+          x64Link=${x64Link/\/c/C:}
+
           printf '[build]\ntarget = "aarch64-pc-windows-msvc"\n\n[target.aarch64-pc-windows-msvc]\nlinker = "%s"\n\n[target.x86_64-pc-windows-msvc]\nlinker = "%s"' "$arm64Link" "$x64Link" > $HOME/.cargo/config.toml
           cd $cwd
           
