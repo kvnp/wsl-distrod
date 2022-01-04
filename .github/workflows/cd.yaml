@@ -131,15 +131,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get upgrade
-          sudo apt-get install -y patchelf
-          sudo apt-get install -y apt-file; sudo apt-file update
-          sudo apt install gcc-10-aarch64-linux-gnu -y
-          sudo apt install gcc-10 -y
-          sudo ln -sf /bin/aarch64-linux-gnu-gcc-10 /bin/gcc
-          sudo ln -sf /bin/aarch64-linux-gnu-gcc-10 /bin/cc
-          sudo ln -sf /bin/aarch64-linux-gnu-ld-10 /bin/ld
+          sudo apt-get install -y patchelf apt-file gcc-10 gcc-10-aarch64-linux-gnu
+          sudo apt-file update
+
+          sudo ln -sf /bin/gcc-10 /bin/gcc
+          sudo ln -sf /bin/aarch64-linux-gnu-gcc-10 /bin/aarch64-linux-gnu-gcc
+
           rustup self update
           rustup target add aarch64-unknown-linux-gnu
+          printf "deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ focal main restricted universe multiverse\ndeb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ focal-updates main restricted universe multiverse\ndeb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ focal-backports main restricted universe multiverse\ndeb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports/ focal-security main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
+          printf '[build]\ntarget = "aarch64-unknown-linux-gnu"\n\n[target.aarch64-unknown-linux-gnu]\nlinker = "/usr/bin/aarch64-linux-gnu-gcc-10"\n\n[target.x86_64-unknown-linux-gnu]\nlinker = "/usr/bin/gcc-10"' > $HOME/.cargo/config.toml
+
+          sudo dpkg --add-architecture arm64
+          sudo apt update && sudo apt install -y pkg-config libssl-dev:arm64 libssl-dev:amd64
           
       - name: Build the Distrod command
         run: PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu/ make distrod-release
@@ -163,7 +167,7 @@ jobs:
 
   build-portproxy-exe:
     name: Build portproxy.exe
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     defaults:
       run:
@@ -178,15 +182,26 @@ jobs:
             ~/.cargo/git
             distrod/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64_arm64
 
       - name: Get the arch name
         shell: bash
         run: |
           echo "ARCH_NAME=aarch64" >> $GITHUB_ENV
 
+      - name: Prepare build
+        run: |
+          rustup target install aarch64-pc-windows-msvc
+          cwd=$(pwd)
+          cd "/c/Program Files/Microsoft Visual Studio"
+          cd $(ls -d */|head -n 1)
+          cd $(ls -d */|head -n 1)
+          cd VC/Tools/MSVC/
+          cd $(ls -d */|head -n 1)
+          arm64Link=$(pwd)/bin/Hostx64/arm64/link.exe
+          x64Link=$(pwd)/bin/Hostx64/x64/link.exe
+          printf '[build]\ntarget = "aarch64-pc-windows-msvc"\n\n[target.aarch64-pc-windows-msvc]\nlinker = "%s"\n\n[target.x86_64-pc-windows-msvc]\nlinker = "%s"' "$arm64Link" "$x64Link" > $HOME/.cargo/config.toml
+          cd $cwd
+          
       - name: Build
         run: make -f windows.mk portproxy.exe
 
@@ -194,5 +209,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "portproxy-${{ env.ARCH_NAME }}"
-          path: distrod/target/release/portproxy.exe
+          path: distrod/target/release/aarch64-pc-windows-msvc/portproxy.exe
           if-no-files-found: error
