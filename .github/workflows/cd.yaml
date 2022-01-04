@@ -196,7 +196,9 @@ jobs:
           cd $(ls -d */|head -n 1)
           cd $(ls -d */|head -n 1)
           cd VC/Tools/MSVC/
-          cd $(ls -d */|head -n 1)
+          versions=($(ls -d *))
+          cd ${versions[-1]}
+          ls bin/Hostx64
           arm64Link=$(pwd)/bin/Hostx64/arm64/link.exe
           x64Link=$(pwd)/bin/Hostx64/x64/link.exe
           arm64Link=${arm64Link/\/c/C:}
