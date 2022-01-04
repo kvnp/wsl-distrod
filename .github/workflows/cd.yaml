@@ -146,6 +146,7 @@ jobs:
           sudo apt update && sudo apt install -y pkg-config libssl-dev:arm64 libssl-dev:amd64 liblzma-dev:arm64 liblzma-dev:amd64
           
           sudo apt-file update
+          cargo install --git https://github.com/EmbarkStudios/cargo-about.git --rev b4d194a734215f55a88191236cd5112ddb198920
 
       - name: Build the Distrod command
         run: PKG_CONFIG_SYSROOT_DIR=/usr/aarch64-linux-gnu/ make distrod-release
