@@ -9,7 +9,7 @@ distrod-release: distrod-bins distrod/target/release/portproxy.exe
 	./distrod_packer/distrod_packer ./distrod opt_distrod.tar.gz --pack-distrod-opt-dir
 
 distrod-bins:
-	cd distrod; cargo build --target=aarch64-unknown-linux-gnu --release -p distrod -p distrod-exec -p portproxy
+	cd distrod; cargo build --release -p distrod -p distrod-exec -p portproxy
 
 unit-test-linux:
 	cd distrod; cargo test --verbose -p libs -p portproxy -p distrod-exec ${TEST_TARGETS}

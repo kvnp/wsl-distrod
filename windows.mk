@@ -16,7 +16,7 @@ distrod/distrod_wsl_launcher/resources/distrod_root.tar.gz: $(ROOTFS_PATH)
 	fi
 
 distrod_wsl_launcher: distrod/distrod_wsl_launcher/resources/distrod_root.tar.gz
-	cd distrod; cargo.exe build --target=aarch64-pc-windows-msvc --release -p distrod_wsl_launcher
+	cd distrod; cargo.exe build --release -p distrod_wsl_launcher
 
 distrod/target/release/portproxy.exe: portproxy.exe
 portproxy.exe:
