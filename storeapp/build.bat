@@ -38,6 +38,15 @@ if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Cu
     set MSBUILD="%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\MSBuild.exe"
     goto :FOUND_MSBUILD
 )
+if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\msbuild.exe" (
+	set MSBUILD="%ProgramFiles%\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\msbuild.exe"
+    goto :FOUND_MSBUILD
+)
+if exist "%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\msbuild.exe" (
+	set MSBUILD="%ProgramFiles%\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\msbuild.exe"
+    goto :FOUND_MSBUILD
+)
+C:\Program Files\Microsoft Visual Studio\
 if exist "%ProgramFiles(x86)%\MSBuild\14.0\bin" (
     set MSBUILD="%ProgramFiles(x86)%\MSBuild\14.0\bin\msbuild.exe"
     goto :FOUND_MSBUILD
