@@ -192,19 +192,21 @@ jobs:
         run: |
           rustup target install aarch64-pc-windows-msvc
           cwd=$(pwd)
+
           cd "/c/Program Files/Microsoft Visual Studio"
           cd $(ls -d */|head -n 1)
           cd $(ls -d */|head -n 1)
           cd VC/Tools/MSVC/
           versions=($(ls -d *))
           cd ${versions[-1]}
-          ls bin/Hostx64
+
           arm64Link=$(pwd)/bin/Hostx64/arm64/link.exe
           x64Link=$(pwd)/bin/Hostx64/x64/link.exe
           arm64Link=${arm64Link/\/c/C:}
           x64Link=${x64Link/\/c/C:}
 
           printf '[build]\ntarget = "aarch64-pc-windows-msvc"\n\n[target.aarch64-pc-windows-msvc]\nlinker = "%s"\n\n[target.x86_64-pc-windows-msvc]\nlinker = "%s"' "$arm64Link" "$x64Link" > $HOME/.cargo/config.toml
+
           cd $cwd
           
       - name: Build
@@ -214,5 +216,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: "portproxy-${{ env.ARCH_NAME }}"
-          path: distrod/target/release/aarch64-pc-windows-msvc/release/portproxy.exe
+          path: distrod/target/aarch64-pc-windows-msvc/release/portproxy.exe
           if-no-files-found: error
